@@ -43,7 +43,3 @@ Once validated, the prescription is transformed into recurring events in the pat
 * `services/data_service.py`: Handling of local databases (CSV/PDF).
 * `data/`: Contains the medical nomenclators used.
 
-
-
-# Run the application
-streamlit run main.py
