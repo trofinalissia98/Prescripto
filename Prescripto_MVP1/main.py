@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image
 import pandas as pd
 
-# Importăm funcțiile create anterior
 from services.ai_service import analyze_prescription, explain_diagnosis
 from services.data_service import load_meds_database, find_alternatives_by_dci, get_disease_from_pdf
 
