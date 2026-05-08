@@ -6,14 +6,12 @@ import pandas as pd
 from services.ai_service import analyze_prescription, explain_diagnosis
 from services.data_service import load_meds_database, find_alternatives_by_dci, get_disease_from_pdf
 
-# Setăm aspectul paginii
 st.set_page_config(page_title="Prescripto MVP", layout="wide")
 
 st.title("💊 Prescripto - Traducătorul tău de rețete medicale")
 st.markdown("Încarcă o poză cu rețeta. AI-ul o va citi, iar tu validezi datele înainte să le punem în Google Calendar.")
 
 
-# ----------------- CACHE & OPTIMIZARE -----------------
 @st.cache_data
 def incarca_date():
     return load_meds_database("data/medicamente.csv")
@@ -24,11 +22,9 @@ def traducere_diagnostic_salvata(text_medical):
     return explain_diagnosis(text_medical)
 
 
-# ------------------------------------------------------
 
 df_meds = incarca_date()
 
-# 1. Zona de Upload
 uploaded_file = st.file_uploader("Fă o poză la rețetă sau încarcă un fișier (JPG, PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -55,7 +51,6 @@ if uploaded_file is not None:
             else:
                 st.success("Date extrase cu succes! Te rugăm să le validezi mai jos.")
 
-                # --- VERIFICARE DIAGNOSTIC ---
                 st.markdown("### 🩺 Diagnostic")
                 valoare_initiala_cod = str(datele.get("cod_diagnostic", ""))
                 if valoare_initiala_cod.lower() in ["none", "null"]:
@@ -82,7 +77,6 @@ if uploaded_file is not None:
                 else:
                     st.warning("Nu a fost introdus un cod de boală valid.")
 
-                # --- VERIFICARE MEDICAMENTE (Human in the Loop) ---
                 st.markdown("### 💊 Plan de Tratament (Editează dacă AI-ul a greșit)")
 
                 with st.form("formular_validare"):
@@ -91,29 +85,23 @@ if uploaded_file is not None:
                     for i, med in enumerate(datele.get("medicamente", [])):
                         st.markdown(f"**Medicament {i + 1}**")
 
-                        # Numele citit de AI (AFIȘAT DOAR PENTRU COMPARAȚIE, NU EDITABIL DIRECT AICI PENTRU AUTO-SUGGEST)
                         nume_citit_ai = med.get("nume_brand_citit", "")
                         st.info(f"🧐 **AI-ul a citit de pe foaie:** {nume_citit_ai}")
 
-                        # -------------------------------------------------------------
-                        # CĂUTARE DINAMICĂ: Această căsuță caută în nomenclator
                         termen_cautare = st.text_input(
                             f"Caută manual medicamentul (sau corectează AI-ul):",
-                            value=nume_citit_ai,  # O pre-populăm cu ce a zis AI-ul
+                            value=nume_citit_ai,
                             key=f"search_{i}"
                         )
 
-                        # Căutăm în baza de date pe baza textului introdus de utilizator
-                        # Folosim primele litere pentru o căutare mai permisivă
                         if len(termen_cautare) >= 3:
-                            # Luăm primele 4 litere (sau câte sunt) pentru o potrivire parțială
+
                             termen_baza = termen_cautare[:4].upper()
                             match_df = df_meds[
                                 df_meds['Denumire comerciala'].str.contains(termen_baza, case=False, na=False)]
                         else:
-                            match_df = pd.DataFrame()  # Tabel gol dacă sunt prea puține litere
+                            match_df = pd.DataFrame()
 
-                        # Auto-Suggest Dropdown
                         nume_ales_din_baza = None
                         if not match_df.empty:
                             optiuni_gasite = match_df['Denumire comerciala'].unique().tolist()
@@ -126,8 +114,7 @@ if uploaded_file is not None:
                             st.warning(
                                 f"⚠️ Nu am găsit '{termen_cautare}' în baza de date. Încearcă să schimbi literele.")
 
-                        # Extragerea DCI și alternativelor
-                        nume_final_de_salvat = termen_cautare  # Default la ce a scris omul
+                        nume_final_de_salvat = termen_cautare
 
                         if nume_ales_din_baza:
                             nume_final_de_salvat = nume_ales_din_baza
@@ -143,7 +130,6 @@ if uploaded_file is not None:
                                          alt.get('Denumire comerciala') != nume_ales_din_baza][:5]))
                                 if optiuni_brand:
                                     st.write(f"💡 Alternative mai ieftine/similare: {', '.join(optiuni_brand)}")
-                        # -------------------------------------------------------------
 
                         doza = st.text_input("Dozaj", value=med.get("doza", ""), key=f"doza_{i}")
                         instructiuni = st.text_area("Instrucțiuni Pacient", value=med.get("instructiuni_pacient", ""),

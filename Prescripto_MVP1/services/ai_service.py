@@ -3,27 +3,22 @@ import json
 from utils.config import GEMINI_API_KEY
 from PIL import Image
 
-# Configurăm cheia API pentru Gemini
+
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Alegem modelul potrivit pentru poze (Vision)
+
 model = genai.GenerativeModel('gemini-flash-latest')
-#model = genai.GenerativeModel('gemini-2.5-flash')
+
 
 
 def analyze_prescription(image_file):
-    """
-    Trimite imaginea rețetei către Gemini AI și cere un răspuns structurat (JSON).
-    Returnează un dicționar Python cu datele extrase.
-    """
 
-    # Deschidem imaginea (fie din path, fie direct din Streamlit)
     try:
         img = Image.open(image_file)
     except Exception as e:
         return {"eroare": f"Nu am putut deschide imaginea: {e}"}
 
-    # Acesta este PROMPT-UL MAGIC. Modul în care îi vorbim AI-ului dictează calitatea aplicației voastre.
+
     prompt = """
     Ești un asistent medical expert în citirea rețetelor medicale scrise de mână sau printate.
     Te rog să analizezi imaginea acestei rețete și să extragi lista de medicamente.
@@ -49,14 +44,11 @@ def analyze_prescription(image_file):
     """
 
     try:
-        # Generăm răspunsul de la AI
         response = model.generate_content([prompt, img])
         text_response = response.text
 
-        # Curățăm răspunsul (uneori AI-ul pune ```json la început)
         text_response = text_response.replace('```json', '').replace('```', '').strip()
 
-        # Transformăm textul primit în Dicționar Python
         date_structurate = json.loads(text_response)
         return date_structurate
 
@@ -68,7 +60,6 @@ def analyze_prescription(image_file):
 
 
 def explain_diagnosis(medical_text):
-    """Folosește AI pentru a traduce un diagnostic sec într-o explicație simplă și empatică."""
     if not medical_text:
         return "Nu am putut extrage textul diagnosticului."
 
@@ -80,7 +71,6 @@ def explain_diagnosis(medical_text):
     """
 
     try:
-        # Folosim același model pe care l-ai configurat mai devreme
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
