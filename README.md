@@ -43,13 +43,7 @@ Once validated, the prescription is transformed into recurring events in the pat
 * `services/data_service.py`: Handling of local databases (CSV/PDF).
 * `data/`: Contains the medical nomenclators used.
 
-## 🔧 Installation & Usage
-```bash
-# Clone the repository
-git clone [https://github.com/trofinalissia98/prescripto.git](https://github.com/trofinalissia98/prescripto.git)
 
-# Install dependencies
-pip install -r requirements.txt
 
 # Run the application
 streamlit run main.py
