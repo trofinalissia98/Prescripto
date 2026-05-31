@@ -81,14 +81,11 @@ prescripto/
 │   ├── medicamente.csv      # Official dataset for pharmaceutical names & DCI
 │   └── coduri_boala.pdf     # National disease catalog containing standard diagnostic indexes
 ├── services/
-│   ├── __init__.py
 │   ├── ai_service.py        # Gemini config, multimodal bindings, prompt engineering
 │   └── data_service.py      # Pandas & PyPDF2 indexing lookup logic
 ├── utils/
-│   ├── __init__.py
 │   └── config.py            # Environment credentials parsing (GEMINI_API_KEY)
 ├── main.py                  # Streamlit layouts, UI routing, verification pipelines
-├── requirements.txt         # Application dependencies sheet
 └── README.md                # You are here
 ```
 
@@ -117,19 +114,14 @@ source venv/bin/activate
 venv\Scripts ctivate
 ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Setup Environment Configurations
+### 3. Setup Environment Configurations
 Create a `utils/config.py` file to store your credentials:
 ```python
 # utils/config.py
 GEMINI_API_KEY = "YOUR_ACTUAL_GEMINI_API_KEY_HERE"
 ```
 
-### 5. Launch the Application
+### 4. Launch the Application
 Start the interactive local Streamlit dashboard:
 ```bash
 streamlit run main.py
